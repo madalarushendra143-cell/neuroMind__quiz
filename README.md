@@ -1,5 +1,3 @@
-# neuroMind__quiz
-ai mind analyzer quiz website
 hackheros
 educational technology
 problem statement
