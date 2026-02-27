@@ -47,12 +47,36 @@ cursor:pointer;
 <div class="box">
 <h2>Login</h2>
 
-<form action="quiz.html">
-<input type="text" name="user" placeholder="Enter Username" required>
+<form onsubmit="return checkLogin()">
+
+<input type="text" id="user" placeholder="Enter Username" required>
+<input type="password" id="pass" placeholder="Enter Password" required>
+
 <button type="submit">Start Quiz</button>
+
 </form>
 
+<p id="msg" style="color:red;"></p>
+
 </div>
+
+<script>
+function checkLogin(){
+
+let username=document.getElementById("user").value;
+let password=document.getElementById("pass").value;
+
+if(password==="rushi"){
+window.location.href="quiz.html?user="+encodeURIComponent(username);
+return false;
+}
+else{
+document.getElementById("msg").innerText="Wrong Password ❌";
+return false;
+}
+
+}
+</script>
 
 </body>
 </html>
