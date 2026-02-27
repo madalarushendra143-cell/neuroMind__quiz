@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Quiz</title>
+
+<style>
+body{
+font-family:Arial;
+background:linear-gradient(to right,#4facfe,#00f2fe);
+margin:0;
+padding:40px;
+text-align:center;
+}
+
+.container{
+background:white;
+padding:25px;
+border-radius:15px;
+width:60%;
+margin:auto;
+box-shadow:0 0 15px gray;
+}
+
+.option{
+background:#ecf0f1;
+margin:10px;
+padding:12px;
+border-radius:8px;
+cursor:pointer;
+font-size:18px;
+}
+.option:hover{background:#d0e6f7;}
+
+#timer{
+color:red;
+font-size:20px;
+font-weight:bold;
+}
+
+#resultBox{
+font-size:22px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h2 id="welcome"></h2>
+<div id="timer">60:00</div>
+
+<h3 id="question"></h3>
+<div id="options"></div>
+
+</div>
+
+<script>
+
+/* USERNAME FROM LOGIN */
+const params=new URLSearchParams(window.location.search);
+const username=params.get("user");
+document.getElementById("welcome").innerText="Welcome "+username;
+
+/* QUESTIONS */
+const quiz=[
+{q:"HTML stands for?",o:["Hyper Trainer","Hyper Text Markup Language","Hyper Tool","None"],a:1},
+{q:"CSS used for?",o:["Logic","Style","DB","Server"],a:1},
+{q:"JS is?",o:["Language","Tag","Style","Server"],a:0},
+{q:"<p> tag is?",o:["Heading","Paragraph","Image","Link"],a:1},
+{q:"ID selector?",o:[".","#","$","@"],a:1},
+{q:"Loop?",o:["if","for","case","break"],a:1},
+{q:"HTML extension?",o:[".js",".html",".css",".py"],a:1},
+{q:"Color property?",o:["font","color","bg","text"],a:1},
+{q:"Console output?",o:["echo","console.log","print","write"],a:1},
+{q:"Variable keyword?",o:["var","num","int","define"],a:0},
+{q:"Array bracket?",o:["()","[]","{}","<>"],a:1},
+{q:"Image tag?",o:["img","src","pic","image"],a:0},
+{q:"Boolean?",o:["yes","true","ok","done"],a:1},
+{q:"JS comment?",o:[" // "," # "," % "," * "],a:0},
+{q:"Alert function?",o:["alert()","msg()","show()","note()"],a:0}
+];
+
+let index=0;
+let score=0;
+
+/* LOAD QUESTION */
+function loadQ(){
+document.getElementById("question").innerText=(index+1)+". "+quiz[index].q;
+
+let opts="";
+quiz[index].o.forEach((v,i)=>{
+opts+=`<div class="option" onclick="check(${i})">${v}</div>`;
+});
+document.getElementById("options").innerHTML=opts;
+}
+loadQ();
+
+/* CHECK ANSWER */
+function check(i){
+let box=document.getElementById("options");
+
+if(i===quiz[index].a){
+box.innerHTML="<h2 style='color:green'>Correct ✅</h2>";
+score++;
+}else{
+box.innerHTML="<h2 style='color:red'>Incorrect ❌</h2>";
+}
+
+/* NEXT QUESTION AUTO */
+setTimeout(()=>{
+index++;
+if(index<quiz.length){
+loadQ();
+}else{
+finishQuiz();
+}
+},1500);
+}
+
+/* RESULT */
+function finishQuiz(){
+let percent=(score/quiz.length)*100;
+
+document.querySelector(".container").innerHTML=
+`<div id="resultBox">
+<h1>Quiz Finished 🎉</h1>
+<h2>Marks: ${score}/${quiz.length}</h2>
+<h2>Percentage: ${percent.toFixed(2)}%</h2>
+</div>`;
+
+setTimeout(()=>window.close(),5000);
+}
+
+/* TIMER 1 HOUR */
+let time=3600;
+let timer=setInterval(()=>{
+let m=Math.floor(time/60);
+let s=time%60;
+document.getElementById("timer").innerText=`${m}:${s<10?"0"+s:s}`;
+time--;
+
+if(time<0){
+clearInterval(timer);
+finishQuiz();
+}
+},1000);
+
+</script>
+
+</body>
+</html>
