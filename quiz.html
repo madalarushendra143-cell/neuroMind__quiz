@@ -1,169 +1,199 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Smart Quiz</title>
-
+<title>Quiz with Explanation</title>
 <style>
 body{
-font-family:Arial;
-background:linear-gradient(to right,#4facfe,#00f2fe);
-margin:0;
-padding:40px;
-text-align:center;
+  font-family:Arial;
+  background:linear-gradient(to right,#4facfe,#00f2fe);
+  margin:0;
+  padding:40px;
+  text-align:center;
 }
-
 .container{
-background:white;
-padding:25px;
-border-radius:15px;
-width:60%;
-margin:auto;
-box-shadow:0 0 15px gray;
+  background:white;
+  padding:25px;
+  border-radius:15px;
+  width:60%;
+  margin:auto;
+  box-shadow:0 0 15px gray;
 }
-
 .option{
-background:#ecf0f1;
-margin:10px;
-padding:12px;
-border-radius:8px;
-cursor:pointer;
-font-size:18px;
+  background:#ecf0f1;
+  margin:10px;
+  padding:12px;
+  border-radius:8px;
+  cursor:pointer;
+  font-size:18px;
 }
 .option:hover{background:#d0e6f7;}
-
-#timer{
-color:red;
-font-size:20px;
-font-weight:bold;
+#timer{color:red;font-size:20px;font-weight:bold;}
+#resultBox{font-size:22px;padding:20px;border-radius:15px;background:#f9fbfd;}
+button{
+padding:10px 20px;
+margin:10px;
+font-size:16px;
+border:none;
+border-radius:8px;
+cursor:pointer;
+background:#3498db;
+color:white;
 }
-
-#resultBox{
-font-size:22px;
-}
+button:hover{background:#2980b9;}
 </style>
 </head>
-
 <body>
 
-<div class="container">
-
-<h2 id="welcome"></h2>
+<div class="container" id="quizBox">
+<h2>Welcome to the Quiz 🚀</h2>
 <div id="timer">60:00</div>
-
 <h3 id="question"></h3>
 <div id="options"></div>
-
 </div>
+
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
 <script>
 
-/* USERNAME */
-const params=new URLSearchParams(window.location.search);
-const username=params.get("user") || "Student";
-document.getElementById("welcome").innerText="Welcome "+username;
-
-
-/* EASY QUESTIONS */
-const easyQ=[
+// Questions
+const quiz=[
 {q:"HTML stands for?",o:["Hyper Trainer","Hyper Text Markup Language","Hyper Tool","None"],a:1},
 {q:"CSS used for?",o:["Logic","Style","DB","Server"],a:1},
 {q:"JS is?",o:["Language","Tag","Style","Server"],a:0},
 {q:"<p> tag is?",o:["Heading","Paragraph","Image","Link"],a:1},
-{q:"ID selector?",o:[".","#","$","@"],a:1}
-];
-
-
-/* HARD QUESTIONS */
-const hardQ=[
-{q:"Console print method?",o:["print()","console.log()","echo()","write()"],a:1},
-{q:"JS comment symbol?",o:["//","#","*","%"],a:0},
+{q:"ID selector?",o:[".","#","$","@"],a:1},
+{q:"Loop?",o:["if","for","case","break"],a:1},
+{q:"HTML extension?",o:[".js",".html",".css",".py"],a:1},
+{q:"Color property?",o:["font","color","bg","text"],a:1},
+{q:"Console output?",o:["echo","console.log","print","write"],a:1},
+{q:"Variable keyword?",o:["var","num","int","define"],a:0},
 {q:"Array bracket?",o:["()","[]","{}","<>"],a:1},
-{q:"Variable keyword?",o:["var","num","int","define"],a:0}
+{q:"Image tag?",o:["img","src","pic","image"],a:0},
+{q:"Boolean?",o:["yes","true","ok","done"],a:1},
+{q:"JS comment?",o:[" // "," # "," % "," * "],a:0},
+{q:"Alert function?",o:["alert()","msg()","show()","note()"],a:0}
 ];
 
-let currentSet=easyQ;
-let index=Math.floor(Math.random()*currentSet.length);
-let score=0;
-let totalAnswered=0;
-let maxQuestions=10;
+// Explanations
+const explanations=[
+"HTML is Hyper Text Markup Language used to structure web pages.",
+"CSS is used to style HTML elements.",
+"JS is a programming language for interactive pages.",
+"<p> tag defines a paragraph.",
+"ID selector uses # symbol.",
+"For loop repeats code.",
+".html is extension.",
+"color property sets text color.",
+"console.log prints output.",
+"var declares variable.",
+"Arrays use [].",
+"img displays images.",
+"Boolean = true or false.",
+"// is JS comment.",
+"alert() shows popup."
+];
 
-
-/* LOAD QUESTION */
-function loadQ(){
-
-if(totalAnswered>=maxQuestions){
-finishQuiz();
-return;
+// RANDOM SHUFFLE
+for(let i=quiz.length-1;i>0;i--){
+let j=Math.floor(Math.random()*(i+1));
+[quiz[i],quiz[j]]=[quiz[j],quiz[i]];
+[explanations[i],explanations[j]]=[explanations[j],explanations[i]];
 }
 
-document.getElementById("question").innerText=
-(totalAnswered+1)+". "+currentSet[index].q;
+let index=0;
+let score=0;
+let time=3600;
+let timer;
 
+// Load Question
+function loadQ(){
+document.getElementById("question").innerText=(index+1)+". "+quiz[index].q;
 let opts="";
-currentSet[index].o.forEach((v,i)=>{
+quiz[index].o.forEach((v,i)=>{
 opts+=`<div class="option" onclick="check(${i})">${v}</div>`;
 });
 document.getElementById("options").innerHTML=opts;
 }
-loadQ();
 
-
-/* CHECK ANSWER */
+// Check Answer
 function check(i){
-
 let box=document.getElementById("options");
 
-if(i===currentSet[index].a){
-box.innerHTML="<h2 style='color:green'>Correct ✅ Hard Question Coming...</h2>";
+if(i===quiz[index].a){
+box.innerHTML=`<h2 style='color:green'>Correct ✅</h2>
+<p><b>Explanation:</b> ${explanations[index]}</p>`;
 score++;
-currentSet=hardQ;
 }else{
-box.innerHTML="<h2 style='color:red'>Incorrect ❌ Easy Question Coming...</h2>";
-currentSet=easyQ;
+box.innerHTML=`<h2 style='color:red'>Incorrect ❌</h2>
+<p>Correct answer: "${quiz[index].o[quiz[index].a]}"</p>`;
+setTimeout(()=>{
+box.innerHTML+=`<p><b>Explanation:</b> ${explanations[index]}</p>`;
+},1500);
 }
 
-totalAnswered++;
-index=Math.floor(Math.random()*currentSet.length);
-
-setTimeout(loadQ,1200);
+setTimeout(()=>{
+index++;
+if(index<quiz.length){loadQ();}
+else{finishQuiz();}
+},3000);
 }
 
-
-/* RESULT */
-function finishQuiz(){
-
-let percent=(score/maxQuestions)*100;
-
-document.querySelector(".container").innerHTML=
-`<div id="resultBox">
-<h1>Quiz Finished 🎉</h1>
-<h2>Marks: ${score}/${maxQuestions}</h2>
-<h2>Percentage: ${percent.toFixed(2)}%</h2>
-</div>`;
-
-setTimeout(()=>window.close(),5000);
-}
-
-
-/* TIMER */
-let time=3600;
-
-let timer=setInterval(()=>{
+// Timer
+function updateTimer(){
 let m=Math.floor(time/60);
 let s=time%60;
-
-document.getElementById("timer").innerText=
-`${m}:${s<10?"0"+s:s}`;
-
+document.getElementById("timer").innerText=`${m}:${s<10?"0"+s:s}`;
 time--;
-
 if(time<0){
 clearInterval(timer);
 finishQuiz();
 }
-},1000);
+}
+
+// Finish Quiz
+function finishQuiz(){
+clearInterval(timer);
+let percent=(score/quiz.length)*100;
+
+let remark="";
+if(percent>=90){ remark="Excellent ⭐"; }
+else if(percent>=70){ remark="Good 👍"; }
+else if(percent>=50){ remark="Average 🙂"; }
+else{ remark="Need Improvement ⚠"; }
+
+document.getElementById("quizBox").innerHTML=
+`<div id="resultBox">
+<h1>Quiz Finished 🎉</h1>
+<h2>Marks: ${score}/${quiz.length}</h2>
+<h2>Percentage: ${percent.toFixed(2)}%</h2>
+<h2>${remark}</h2>
+
+<button onclick="downloadImage()">📸 Download Result</button>
+<button onclick="sendMail()">📧 Send Result</button>
+</div>`;
+}
+
+// Download Image
+function downloadImage(){
+html2canvas(document.getElementById("resultBox")).then(canvas=>{
+let link=document.createElement("a");
+link.download="Quiz_Result.png";
+link.href=canvas.toDataURL();
+link.click();
+});
+}
+
+// Send Mail
+function sendMail(){
+let subject="Quiz Result";
+let body=`Marks: ${score}/${quiz.length}%0D%0APercentage: ${(score/quiz.length*100).toFixed(2)}%`;
+window.location.href=`mailto:yourmail@example.com?subject=${subject}&body=${body}`;
+}
+
+// Start
+loadQ();
+timer=setInterval(updateTimer,1000);
 
 </script>
-
 </body>
 </html>
