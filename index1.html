@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>C Language Smart Quiz</title>
+
+<style>
+
+body{
+    font-family: Arial;
+    background: linear-gradient(135deg,#1f4037,#99f2c8);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+}
+
+.quiz-container{
+    background:white;
+    width:600px;
+    padding:25px;
+    border-radius:15px;
+    box-shadow:0 15px 35px rgba(0,0,0,0.4);
+    text-align:center;
+}
+
+h2{
+    color:#1f4037;
+}
+
+input[type=text]{
+    padding:10px;
+    width:80%;
+    margin:10px;
+}
+
+button{
+    padding:10px 22px;
+    border:none;
+    background:#1f4037;
+    color:white;
+    border-radius:6px;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#145a4a;
+}
+
+#timer{
+    color:red;
+    font-weight:bold;
+    font-size:18px;
+}
+
+</style>
+
+<script>
+
+let username="";
+let current=0;
+let score=0;
+let timeLeft=600;
+let timerInterval;
+
+let questions=[
+{q:"1. Who developed C language?",options:["James Gosling","Dennis Ritchie","Bjarne Stroustrup"],answer:1},
+{q:"2. C is a ______ language?",options:["Procedural","Object Oriented","Scripting"],answer:0},
+{q:"3. Entry point of C program?",options:["start()","main()","begin()"],answer:1},
+{q:"4. Header file for printf()?",options:["stdio.h","math.h","conio.h"],answer:0},
+{q:"5. Array index starts from?",options:["1","0","-1"],answer:1},
+{q:"6. Loop runs at least once?",options:["for","while","do-while"],answer:2},
+{q:"7. Assignment operator?",options:["=","==","!="],answer:0},
+{q:"8. Logical AND?",options:["&&","&","||"],answer:0},
+{q:"9. Pointer symbol?",options:["*","#","@"],answer:0},
+{q:"10. C language is?",options:["High level","Low level","Both"],answer:2}
+];
+
+function startQuiz(){
+    username=document.getElementById("username").value;
+
+    if(username===""){
+        alert("Enter Username");
+        return;
+    }
+
+    document.getElementById("quizBox").innerHTML=
+    `
+    <div id="timer"></div>
+    <h2>Welcome ${username} 🚀</h2>
+    <h3 id="question"></h3>
+    <div id="options"></div>
+    <br>
+    <button onclick="nextQuestion()">Next</button>
+    <div id="result"></div>
+    `;
+
+    loadQuestion();
+    startTimer();
+}
+
+function startTimer(){
+    timerInterval=setInterval(()=>{
+        let m=Math.floor(timeLeft/60);
+        let s=timeLeft%60;
+
+        document.getElementById("timer").innerHTML=
+        "Time Left: "+m+"m "+s+"s";
+
+        timeLeft--;
+
+        if(timeLeft<0){
+            clearInterval(timerInterval);
+            showResult();
+        }
+    },1000);
+}
+
+function loadQuestion(){
+    let q=questions[current];
+    document.getElementById("question").innerText=q.q;
+
+    let html="";
+    for(let i=0;i<q.options.length;i++){
+        html+=`<input type="radio" name="option" value="${i}">
+        ${q.options[i]}<br>`;
+    }
+
+    document.getElementById("options").innerHTML=html;
+}
+
+function nextQuestion(){
+
+    let selected=document.querySelector('input[name="option"]:checked');
+
+    if(!selected){
+        alert("Select Answer");
+        return;
+    }
+
+    if(parseInt(selected.value)===questions[current].answer)
+        score++;
+
+    current++;
+
+    if(current<questions.length)
+        loadQuestion();
+    else{
+        clearInterval(timerInterval);
+        showResult();
+    }
+}
+
+function showResult(){
+
+    let percentage=(score/questions.length)*100;
+
+    document.getElementById("quizBox").innerHTML=
+    `
+    <h2>Quiz Completed 🎉</h2>
+    <h3>User : ${username}</h3>
+    <h3>Score : ${score}/${questions.length}</h3>
+    <h3>Percentage : ${percentage.toFixed(2)}%</h3>
+    `;
+}
+
+</script>
+
+</head>
+
+<body>
+
+<div class="quiz-container" id="quizBox">
+
+<h2>C Language Smart Quiz</h2>
+
+<input type="text" id="username" placeholder="Enter Username">
+
+<br>
+
+<button onclick="startQuiz()">Start Quiz</button>
+
+</div>
+
+</body>
+</html>
