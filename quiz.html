@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Quiz</title>
+<title>Smart Quiz</title>
 
 <style>
 body{
@@ -57,87 +57,104 @@ font-size:22px;
 
 <script>
 
-/* USERNAME FROM LOGIN */
+/* USERNAME */
 const params=new URLSearchParams(window.location.search);
-const username=params.get("user");
+const username=params.get("user") || "Student";
 document.getElementById("welcome").innerText="Welcome "+username;
 
-/* QUESTIONS */
-const quiz=[
+
+/* EASY QUESTIONS */
+const easyQ=[
 {q:"HTML stands for?",o:["Hyper Trainer","Hyper Text Markup Language","Hyper Tool","None"],a:1},
 {q:"CSS used for?",o:["Logic","Style","DB","Server"],a:1},
 {q:"JS is?",o:["Language","Tag","Style","Server"],a:0},
 {q:"<p> tag is?",o:["Heading","Paragraph","Image","Link"],a:1},
-{q:"ID selector?",o:[".","#","$","@"],a:1},
-{q:"Loop?",o:["if","for","case","break"],a:1},
-{q:"HTML extension?",o:[".js",".html",".css",".py"],a:1},
-{q:"Color property?",o:["font","color","bg","text"],a:1},
-{q:"Console output?",o:["echo","console.log","print","write"],a:1},
-{q:"Variable keyword?",o:["var","num","int","define"],a:0},
-{q:"Array bracket?",o:["()","[]","{}","<>"],a:1},
-{q:"Image tag?",o:["img","src","pic","image"],a:0},
-{q:"Boolean?",o:["yes","true","ok","done"],a:1},
-{q:"JS comment?",o:[" // "," # "," % "," * "],a:0},
-{q:"Alert function?",o:["alert()","msg()","show()","note()"],a:0}
+{q:"ID selector?",o:[".","#","$","@"],a:1}
 ];
 
-let index=0;
+
+/* HARD QUESTIONS */
+const hardQ=[
+{q:"Console print method?",o:["print()","console.log()","echo()","write()"],a:1},
+{q:"JS comment symbol?",o:["//","#","*","%"],a:0},
+{q:"Array bracket?",o:["()","[]","{}","<>"],a:1},
+{q:"Variable keyword?",o:["var","num","int","define"],a:0}
+];
+
+let currentSet=easyQ;
+let index=Math.floor(Math.random()*currentSet.length);
 let score=0;
+let totalAnswered=0;
+let maxQuestions=10;
+
 
 /* LOAD QUESTION */
 function loadQ(){
-document.getElementById("question").innerText=(index+1)+". "+quiz[index].q;
+
+if(totalAnswered>=maxQuestions){
+finishQuiz();
+return;
+}
+
+document.getElementById("question").innerText=
+(totalAnswered+1)+". "+currentSet[index].q;
 
 let opts="";
-quiz[index].o.forEach((v,i)=>{
+currentSet[index].o.forEach((v,i)=>{
 opts+=`<div class="option" onclick="check(${i})">${v}</div>`;
 });
 document.getElementById("options").innerHTML=opts;
 }
 loadQ();
 
+
 /* CHECK ANSWER */
 function check(i){
+
 let box=document.getElementById("options");
 
-if(i===quiz[index].a){
-box.innerHTML="<h2 style='color:green'>Correct ✅</h2>";
+if(i===currentSet[index].a){
+box.innerHTML="<h2 style='color:green'>Correct ✅ Hard Question Coming...</h2>";
 score++;
+currentSet=hardQ;
 }else{
-box.innerHTML="<h2 style='color:red'>Incorrect ❌</h2>";
+box.innerHTML="<h2 style='color:red'>Incorrect ❌ Easy Question Coming...</h2>";
+currentSet=easyQ;
 }
 
-/* NEXT QUESTION AUTO */
-setTimeout(()=>{
-index++;
-if(index<quiz.length){
-loadQ();
-}else{
-finishQuiz();
+totalAnswered++;
+index=Math.floor(Math.random()*currentSet.length);
+
+setTimeout(loadQ,1200);
 }
-},1500);
-}
+
 
 /* RESULT */
 function finishQuiz(){
-let percent=(score/quiz.length)*100;
+
+let percent=(score/maxQuestions)*100;
 
 document.querySelector(".container").innerHTML=
 `<div id="resultBox">
 <h1>Quiz Finished 🎉</h1>
-<h2>Marks: ${score}/${quiz.length}</h2>
+<h2>Marks: ${score}/${maxQuestions}</h2>
 <h2>Percentage: ${percent.toFixed(2)}%</h2>
 </div>`;
 
 setTimeout(()=>window.close(),5000);
 }
 
-/* TIMER 1 HOUR */
+
+/* TIMER */
 let time=3600;
+
 let timer=setInterval(()=>{
 let m=Math.floor(time/60);
 let s=time%60;
-document.getElementById("timer").innerText=`${m}:${s<10?"0"+s:s}`;
+
+document.getElementById("timer").innerText=
+`${m}:${s<10?"0"+s:s}`;
+
 time--;
 
 if(time<0){
